@@ -161,7 +161,6 @@ class UserController extends Controller
 
     public function saveUserNotificationToken(Request $request)
     {
-        $user = Auth::guard('sanctum')->user();
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
             'userToken' => 'required|string|unique:users_tokens,token',
@@ -176,11 +175,11 @@ class UserController extends Controller
             $userToken = $validated['userToken'];
 
             // Retrieve authenticated user
-            $userId = Auth::guard('sanctum')->user()->id;
+            $user = Auth::guard('sanctum')->user();
 
             // Save the new token
             DB::table('users_tokens')->insertGetId([
-                'user_id' => $user->Id,
+                'user_id' => $user->id,
                 'token' => $userToken,
                 'role' => $user->role
 
