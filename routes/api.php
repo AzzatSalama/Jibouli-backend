@@ -119,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
         ->except(['update', 'destroy']);
 
     // Notifications
+    Route::post('notification/token', [UserController::class, 'saveUserNotificationToken']);
     // Route::get('/notifications', [NotificationController::class, 'index']);
     // Route::post('/notifications/mark-read', [NotificationController::class, 'markAllAsRead']);
 });
