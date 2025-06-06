@@ -164,7 +164,7 @@ class UserController extends Controller
         $user = Auth::guard('sanctum')->user();
         // Validate the incoming request
         $validator = Validator::make($request->all(), [
-            'userToken' => 'required|string|unique:usersTokens,token',
+            'userToken' => 'required|string|unique:users_tokens,token',
         ]);
 
         if ($validator->fails()) {
@@ -179,7 +179,7 @@ class UserController extends Controller
             $userId = Auth::guard('sanctum')->user()->id;
 
             // Save the new token
-            DB::table('usersTokens')->insertGetId([
+            DB::table('users_tokens')->insertGetId([
                 'user_id' => $user->Id,
                 'token' => $userToken,
                 'role' => $user->role
