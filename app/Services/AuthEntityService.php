@@ -65,6 +65,6 @@ class AuthEntityService
             return null;
         }
 
-        return $partner
+        return $partner;
     }
 }
