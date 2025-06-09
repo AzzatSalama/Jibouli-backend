@@ -76,7 +76,7 @@ class OrderController extends Controller
             'client_name' => 'required|string|max:255',
             'client_address' => 'required|string|max:500',
             'request' => 'required|string',
-            'partner_id' => 'nullable|exists:partners,id',
+            'partner_id' => 'nullable|exists:partner,id',
             'client_notes' => 'nullable|string',
             'user_notes' => 'nullable|string'
         ]);
@@ -145,7 +145,7 @@ class OrderController extends Controller
     public function show(string $id, AuthEntityService $authEntityService)
     {
         try {
-            $order = Order::with(['client', 'user', 'deliveryPerson', 'cancellationCause'])
+            $order = Order::with(['client', 'Partner', 'user', 'deliveryPerson', 'cancellationCause'])
                 ->findOrFail($id);
 
             if ($order->status === 'canceled') {
@@ -176,14 +176,21 @@ class OrderController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'status' => ['nullable', Rule::in(['pending', 'accepted', 'delivered', 'canceled'])],
             'delivery_person_id' => 'nullable|exists:delivery_person,id',
             'driver_notes' => 'nullable|string|max:255',
             'client_notes' => 'nullable|string|max:255',
             'employee_notes' => 'nullable|string|max:255',
             'request' => 'nullable|string|max:255',
+            'partner_id' => 'nullable|exists:partner,id',
         ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $validated = $validator->validated();
 
         try {
             return DB::transaction(function () use ($id, $validated, $request) {
@@ -198,6 +205,7 @@ class OrderController extends Controller
                     'client_notes' => $validated['client_notes'] ?? $order->client_notes,
                     'employee_notes' => $validated['employee_notes'] ?? $order->employee_notes,
                     'request' => $validated['request'] ?? $order->request,
+                    'partner_id' => $validated['partner_id'] ?? null,
                 ]);
 
                 Cache::forget('pending_orders');

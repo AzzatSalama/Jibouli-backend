@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
+        Schema::table('order', function (Blueprint $table) {
             $table->foreignId('partner_id')->nullable()->constrained('partners');
         });
     }
 
     public function down()
     {
-        Schema::table('orders', function (Blueprint $table) {
+        Schema::table('order', function (Blueprint $table) {
             $table->dropForeign(['partner_id']);
             $table->dropColumn('partner_id');
         });
