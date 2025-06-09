@@ -181,8 +181,9 @@ class UserController extends Controller
             DB::table('users_tokens')->insertGetId([
                 'user_id' => $user->id,
                 'token' => $userToken,
-                'role' => $user->role
-
+                'role' => $user->role,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
             return response()->json(['message' => 'Token saved successfully', 'role' => $user->role], 200);

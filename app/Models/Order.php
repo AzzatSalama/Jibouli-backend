@@ -24,6 +24,7 @@ class Order extends Model
         'client_notes',
         'user_notes',
         'delivery_person_notes',
+        'partner_id',
         // 'accepted_at',
         'delivered_canceled_at',
     ];

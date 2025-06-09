@@ -76,6 +76,7 @@ class OrderController extends Controller
             'client_name' => 'required|string|max:255',
             'client_address' => 'required|string|max:500',
             'request' => 'required|string',
+            'partner_id' => 'nullable|exists:partners,id',
             'client_notes' => 'nullable|string',
             'user_notes' => 'nullable|string'
         ]);
@@ -84,25 +85,28 @@ class OrderController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        return DB::transaction(function () use ($request, $user, $authEntityService) {
-            // Convert request data to array with all string values
+        $validated = $validator->validated();
+
+        return DB::transaction(function () use ($validated, $user, $authEntityService) {
+            // Convert valid$validated data to array with all string values
             $clientData = [
-                'client_phone' => $request->input('client_phone'),
-                'client_name' => $request->input('client_name'),
-                'client_address' => $request->input('client_address')
+                'client_phone' => $validated['client_phone'],
+                'client_name' => $validated['client_name'],
+                'client_address' => $validated['client_address']
             ];
 
             $client = Client::firstOrCreate(
-                ['client_phone' => $request->input('client_phone')],
+                ['client_phone' => $validated['client_phone']],
                 array_merge($clientData, ['added_by' => $user->id])
             );
 
             $order = Order::create([
                 'client_id' => $client->id,
                 'user_id' => $user->id,
-                'request' => $request->input('request'),
-                'client_notes' => $request->input('client_notes'),
-                'user_notes' => $request->input('employee_notes'),
+                'request' => $validated['request'],
+                'partner_id' => $validated['partner_id'] ?? null,
+                'client_notes' => $validated['client_notes'] ?? null,
+                'user_notes' => $validated['employee_notes'] ?? null,
                 'status' => 'pending'
             ]);
 
