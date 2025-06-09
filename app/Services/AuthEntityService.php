@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Partner;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -54,5 +55,16 @@ class AuthEntityService
 
             default    => \App\Models\User::find($user->id),
         };
+    }
+
+    public function getPartnerById(int $id): ?object
+    {
+        $partner = Partner::find($id);
+
+        if (!$partner) {
+            return null;
+        }
+
+        return $partner
     }
 }

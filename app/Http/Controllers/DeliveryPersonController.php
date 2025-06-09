@@ -107,6 +107,8 @@ class DeliveryPersonController extends Controller
             foreach ($activeOrders as $order) {
                 if ($order->user->role == 'partner')
                     $order->partner = $authEntityService->getUserById($order->user_id);
+                else if ($order->partner_id)
+                    $order->partner = $authEntityService->getPartnerById($order->partner_id);
             }
 
             return response()->json([
