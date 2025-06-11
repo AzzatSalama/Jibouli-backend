@@ -24,11 +24,12 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
-    protected $notificationService;
+    protected $notificationService, $authEntityService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(NotificationService $notificationService, AuthEntityService $authEntityService)
     {
         $this->notificationService = $notificationService;
+        $this->authEntityService = $authEntityService;
     }
 
     public function index()
@@ -327,7 +328,7 @@ class OrderController extends Controller
         // $this->notifyOrderAccepted($order, $deliveryPerson);
     }
 
-    private function handleOrderDelivery(Order $order, AuthEntityService $authEntityService)
+    private function handleOrderDelivery(Order $order)
     {
         $order->update([
             'status' => 'delivered',
@@ -347,7 +348,7 @@ class OrderController extends Controller
         ]);
 
         //check to see if the client is associated with a delievery driver and the delivery driver is not the same as the one who delivered the order
-        $orderCreator = $authEntityService->getUserById($order->client->added_by);
+        $orderCreator = $this->authEntityService->getUserById($order->client->added_by);
         if ($orderCreator instanceof DeliveryPerson) {
             if ($orderCreator->id !== $order->delivery_person_id) {
                 //if the client belongs to a delivery driver and the delivery driver is not the same as the one who delivered the order, increment his balance by 1.00
